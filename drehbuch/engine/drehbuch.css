@@ -1,0 +1,54 @@
+/* Drehbuch engine v1.0 (MIT) – mechanism only. Theme with the tokens, never edit per project. */
+:root {
+  --db-canvas: #0b0a09;     /* page background */
+  --db-surface: #171513;    /* cards, panels */
+  --db-ink: #f3ece2;        /* main text */
+  --db-ink-soft: #a89f94;   /* secondary text, min 4.5:1 on canvas */
+  --db-accent: #e8643c;     /* one accent, used sparingly */
+  --db-accent-ink: #120f0d; /* text on accent */
+  --db-font-display: system-ui, sans-serif;
+  --db-font-text: system-ui, sans-serif;
+  --db-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+html { scroll-behavior: auto; }
+body { background: var(--db-canvas); color: var(--db-ink); font-family: var(--db-font-text); }
+
+/* An act is tall; its stage sticks while the act scrolls past. Length via --len. */
+[data-db="act"] { position: relative; height: var(--len, 100vh); }
+.db-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+
+/* Cues: hidden until their range of --p is reached. */
+.db-js [data-db-cue] { opacity: 0; transform: translateY(1.2rem); transition: opacity .6s var(--db-ease), transform .8s var(--db-ease); }
+.db-js [data-db-cue].on { opacity: 1; transform: none; }
+
+/* Enter once on view. */
+.db-js [data-db-in] { opacity: 0; transform: translateY(1.5rem); transition: opacity .7s var(--db-ease), transform .9s var(--db-ease); }
+.db-js [data-db-in].on { opacity: 1; transform: none; }
+
+/* Kinetic words: staggered by --i once the parent cue or [data-db-in] is on. */
+.db-js [data-db-words] .w { display: inline-block; opacity: 0; transform: translateY(.6em); transition: opacity .5s var(--db-ease), transform .7s var(--db-ease); transition-delay: calc(var(--i) * 45ms); }
+.db-js .on [data-db-words] .w, .db-js [data-db-words].on .w { opacity: 1; transform: none; }
+
+/* Reveal: a wipe driven by the act's --p. Put class db-wipe on the layer that appears. */
+.db-wipe { clip-path: inset(calc((1 - var(--p, 0)) * 100%) 0 0 0); }
+.db-wipe-x { clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0); }
+.db-wipe-circle { clip-path: circle(calc(var(--p, 0) * 75%) at 50% 50%); }
+
+/* Pan track: flex row, moved by the engine. */
+[data-db-pan] { display: flex; will-change: transform; }
+
+/* Parallax layers. */
+[data-db-speed] { will-change: transform; }
+
+/* Scrub video fills its stage. */
+video[data-db-scrub] { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Reduced motion: everything visible, nothing moves, nothing pins longer than needed. */
+.db-reduced [data-db-cue], .db-reduced [data-db-in], .db-reduced [data-db-words] .w { opacity: 1 !important; transform: none !important; transition: none !important; }
+.db-reduced [data-db-speed], .db-reduced [data-db-pan] { transform: none !important; }
+.db-reduced .db-wipe, .db-reduced .db-wipe-x, .db-reduced .db-wipe-circle { clip-path: none; }
+@media (prefers-reduced-motion: reduce) { [data-db="act"] { height: auto; min-height: 100vh; } .db-stage { position: relative; height: auto; min-height: 100vh; } [data-db-pan] { flex-wrap: wrap; } }
+
+/* Focus is always visible. */
+:focus-visible { outline: 2px solid var(--db-accent); outline-offset: 3px; }

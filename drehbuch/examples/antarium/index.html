@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antarium</title>
+<meta name="description" content="A calm ant colony you can keep running beside your day. Watch a single queen grow into a living ant city, one tunnel at a time. Free in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<!-- DREHBUCH:CSS -->
+<style>
+  :root {
+    --db-canvas: #0f0d0a; --db-surface: #1b1813;
+    --db-ink: #f1eadb;    --db-ink-soft: #b3a892;
+    --db-accent: #eaa53d; --db-accent-ink: #1a1206;
+    --db-font-display: "Fraunces", Georgia, serif;
+    --db-font-text: "Inter", system-ui, sans-serif;
+    --soil-1: #3a2a1c; --soil-2: #2c2016; --soil-3: #21180f; --soil-4: #17110b;
+    --grass: #5f7d3a; --grass-dark: #3f5a28;
+    --pad: clamp(24px, 6vw, 96px);
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; line-height: 1.6; font-size: clamp(16px, 1.1vw + 12px, 19px); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+  h1, h2, h3 { font-family: var(--db-font-display); font-weight: 700; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  p { margin: 0; max-width: 58ch; }
+  a { color: inherit; }
+  .soft { color: var(--db-ink-soft); }
+  .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 28px; border-radius: 999px;
+         background: var(--db-accent); color: var(--db-accent-ink); font-weight: 600; text-decoration: none;
+         box-shadow: 0 10px 30px -10px rgba(234,165,61,.55); transition: transform .3s var(--db-ease); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn small { font-weight: 400; opacity: .75; }
+
+  /* ---------- Act 1: meadow (parallax) ---------- */
+  .meadow { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden;
+            background: linear-gradient(#1f2a3a 0%, #6b5a6e 38%, #d99a6c 70%, #f0c48a 100%); }
+  .meadow .layer { position: absolute; left: -5%; width: 110%; pointer-events: none; }
+  .meadow svg { display: block; width: 100%; height: 100%; }
+  .sun { position: absolute; left: 62%; top: 44%; width: clamp(80px, 12vw, 160px); aspect-ratio: 1; border-radius: 50%;
+         background: radial-gradient(circle, #ffe2a8 0 45%, rgba(255,214,150,.0) 70%); }
+  .l-far { bottom: 22%; height: 30%; }
+  .l-hill { bottom: 8%; height: 30%; }
+  .l-front { bottom: -6%; height: 26%; }
+  .hero-copy { position: absolute; left: var(--pad); right: var(--pad); bottom: 30%; z-index: 2; }
+  .hero-copy h1 { font-size: clamp(3.2rem, 11vw, 9rem); color: #fff7e8; text-shadow: 0 6px 30px rgba(40,20,10,.35); }
+  .hero-copy p { margin-top: 14px; font-size: clamp(1.05rem, 1.6vw, 1.35rem); color: #fff3df; text-shadow: 0 2px 12px rgba(40,20,10,.5); max-width: 34ch; }
+  .glass { position: absolute; inset: 0; z-index: 4; pointer-events: none;
+           background: linear-gradient(105deg, rgba(255,255,255,.10) 0 6%, transparent 6% 30%, rgba(255,255,255,.05) 30% 31%, transparent 31%); }
+  .l-front { z-index: 3; }
+
+  /* ---------- Act 2: slow down (pin + cues) ---------- */
+  .slow .db-stage { display: grid; align-content: center; padding: 0 var(--pad); background: var(--db-canvas); }
+  .slow .lines { display: grid; gap: clamp(18px, 3vh, 34px); }
+  .slow h2 { font-size: clamp(2.2rem, 6vw, 5rem); }
+  .slow h2:nth-child(2) { padding-left: clamp(0px, 8vw, 160px); color: var(--db-ink-soft); }
+  .slow h2:nth-child(3) { padding-left: clamp(0px, 16vw, 320px); }
+  .slow h2 em { font-style: normal; color: var(--db-accent); }
+
+  /* ---------- Act 3: dig (signature) ---------- */
+  .dig .db-stage { background: var(--soil-4); }
+  .earth { position: absolute; left: 0; right: 0; top: 0; height: 320svh; will-change: transform; }
+  .earth svg { width: 100%; height: 100%; display: block; }
+  .tunnel { fill: none; stroke: #0c0806; stroke-width: 26; stroke-linecap: round; stroke-linejoin: round; }
+  .tunnel-glow { fill: none; stroke: rgba(234,165,61,.22); stroke-width: 40; stroke-linecap: round; stroke-linejoin: round; filter: blur(6px); }
+  .chamber { fill: #0c0806; transform-box: fill-box; transform-origin: center; transform: scale(.2); opacity: 0; transition: transform .8s var(--db-ease), opacity .6s; }
+  .chamber.lit { transform: scale(1); opacity: 1; }
+  .chamber-light { fill: url(#warm); opacity: 0; transition: opacity 1s; }
+  .chamber-light.lit { opacity: 1; }
+  .ant { fill: #c2531f; }
+  .gauge { position: absolute; right: var(--pad); top: 50%; transform: translateY(-50%); z-index: 3; text-align: right;
+           font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--db-ink-soft); font-size: .85rem; letter-spacing: .06em; }
+  .gauge b { display: block; font-size: clamp(2rem, 5vw, 3.6rem); color: var(--db-ink); font-weight: 600; letter-spacing: -0.02em; }
+  .dig-notes { position: absolute; left: var(--pad); top: 0; bottom: 0; width: min(36ch, 40vw); z-index: 3; }
+  .dig-notes article { position: absolute; top: 50%; translate: 0 -50%; padding: 22px 24px; border-radius: 16px;
+                       background: rgba(15,13,10,.78); backdrop-filter: blur(6px); border: 1px solid rgba(241,234,219,.08); }
+  .dig-notes h3 { font-size: clamp(1.5rem, 2.6vw, 2.2rem); margin-bottom: 8px; }
+  .dig-notes .kicker { font-family: ui-monospace, Menlo, monospace; font-size: .78rem; letter-spacing: .08em; color: var(--db-accent); text-transform: uppercase; margin-bottom: 8px; }
+
+  /* ---------- Act 4: weather (reveal) ---------- */
+  .weather .db-stage { display: grid; }
+  .weather .state { position: absolute; inset: 0; display: grid; align-content: end; padding: 0 var(--pad) 14vh; }
+  .weather .day { background: linear-gradient(#9cc3d9, #d8e6d2 60%, #7d9a52 60.2%, #5f7d3a); color: #142012; }
+  .weather .night { clip-path: inset(0 0 calc((1 - var(--p, 0)) * 100%) 0); background: linear-gradient(#0c1220, #1c2536 58%, #26331f 58.2%, #18210f); color: var(--db-ink); }
+  .weather h2 { font-size: clamp(2.4rem, 7vw, 6rem); }
+  .weather p { margin-top: 12px; font-size: 1.1rem; }
+  .weather .day p { color: #2a3a24; }
+  .weather .night p { color: #c9c2b2; }
+  .rain { position: absolute; inset: 0 0 42% 0; background-image: repeating-linear-gradient(100deg, rgba(200,215,240,.0) 0 14px, rgba(200,215,240,.28) 14px 15px);
+          background-size: 120px 120px; animation: rain .5s linear infinite; opacity: calc(var(--p, 0) * 1.4); }
+  @keyframes rain { to { background-position: -20px 120px; } }
+  .flash { position: absolute; inset: 0; background: #dfe8ff; opacity: 0; mix-blend-mode: soft-light; animation: flash 7s infinite; }
+  @keyframes flash { 0%, 91%, 95%, 100% { opacity: 0; } 92% { opacity: .55; } 93.5% { opacity: .15; } 94% { opacity: .45; } }
+  .weather .night .text { justify-self: end; text-align: right; }
+
+  /* ---------- Act 5: your way (pan) ---------- */
+  .ways .db-stage { display: grid; align-content: center; gap: 36px; background: var(--db-surface); }
+  .ways header { padding: 0 var(--pad); }
+  .ways h2 { font-size: clamp(2.2rem, 5vw, 4.2rem); }
+  .pan-window { overflow: hidden; }
+  .pan-row { gap: 20px; padding: 0 var(--pad); width: max-content; }
+  .card { width: min(78vw, 360px); min-height: 300px; padding: 28px; border-radius: 22px; background: var(--db-canvas);
+          border: 1px solid rgba(241,234,219,.08); display: flex; flex-direction: column; gap: 12px; }
+  .card svg { width: 56px; height: 56px; }
+  .card h3 { font-size: 1.7rem; }
+  .card p { color: var(--db-ink-soft); }
+  .card .tag { margin-top: auto; font-size: .8rem; color: var(--db-accent); font-weight: 600; letter-spacing: .04em; }
+
+  /* ---------- Act 6: facts ---------- */
+  .facts { padding: clamp(96px, 16vh, 180px) var(--pad); display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+  .facts .big { font-family: var(--db-font-display); font-size: clamp(5rem, 16vw, 12rem); line-height: .9; color: var(--db-accent); display: block; }
+  .facts .big-label { font-size: clamp(1.3rem, 2.2vw, 1.8rem); font-family: var(--db-font-display); margin-top: 10px; max-width: 18ch; }
+  .facts ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+  .facts li { padding-top: 18px; border-top: 1px solid rgba(241,234,219,.12); }
+  .facts li strong { display: block; font-weight: 600; }
+  .facts li span { color: var(--db-ink-soft); }
+
+  /* ---------- Act 7: close ---------- */
+  .close { position: relative; min-height: 100vh; min-height: 100svh; display: grid; align-content: center; justify-items: center; text-align: center;
+           padding: 12vh var(--pad); overflow: hidden; background: radial-gradient(ellipse at 50% 120%, #2b2f1c 0%, #121510 45%, #0b0c09 100%); }
+  .close .stars { position: absolute; inset: 0; background-image: radial-gradient(1.5px 1.5px at 20% 30%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 70% 20%, #fff7 50%, transparent 51%), radial-gradient(1.5px 1.5px at 85% 45%, #fff6 50%, transparent 51%), radial-gradient(1px 1px at 35% 12%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 55% 38%, #fff5 50%, transparent 51%), radial-gradient(1.5px 1.5px at 10% 52%, #fff6 50%, transparent 51%); }
+  .close .hill { position: absolute; left: -10%; right: -10%; bottom: -1px; height: 26vh; background: #0e120b; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+  .close .glow { position: absolute; left: 50%; bottom: 8vh; width: 10px; height: 10px; border-radius: 50%; background: var(--db-accent);
+                 box-shadow: 0 0 40px 18px rgba(234,165,61,.35); animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 50% { box-shadow: 0 0 60px 28px rgba(234,165,61,.22); } }
+  .close h2 { font-size: clamp(2.6rem, 8vw, 6.4rem); position: relative; }
+  .close p { position: relative; margin: 18px auto 34px; color: var(--db-ink-soft); }
+  .close .btn { position: relative; }
+  .close .meta { position: relative; margin-top: 18px; font-size: .85rem; color: var(--db-ink-soft); }
+
+  /* ---------- Phone ---------- */
+  @media (max-width: 720px) {
+    .hero-copy { bottom: 34%; }
+    .dig-notes { left: 16px; right: 16px; width: auto; top: auto; bottom: 0; height: 46%; }
+    .dig-notes article { top: auto; bottom: 22px; translate: none; left: 0; right: 0; }
+    .gauge { top: 22px; right: 16px; transform: none; }
+    .facts { grid-template-columns: 1fr; }
+    .weather .night .text { justify-self: start; text-align: left; }
+    .slow h2:nth-child(2), .slow h2:nth-child(3) { padding-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rain, .flash, .close .glow { animation: none; }
+    .earth { position: relative; height: auto; transform: none !important; }
+    .dig .db-stage { min-height: 0; }
+    .dig-notes { position: relative; width: auto; padding: 24px var(--pad); display: grid; gap: 16px; }
+    .dig-notes article { position: relative; top: auto; translate: none; }
+    .weather .state { position: relative; min-height: 70vh; }
+    .weather .night { clip-path: none; }
+    .chamber, .chamber-light { opacity: 1; transform: none; }
+    .pan-row { width: auto; flex-direction: column; }
+    .card { width: auto; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- Act 1: meadow -->
+  <section class="meadow" aria-label="Antarium">
+    <div class="sun" data-db-speed="-0.25"></div>
+    <div class="layer l-far" data-db-speed="-0.18" aria-hidden="true">
+      <svg viewBox="0 0 1200 200" preserveAspectRatio="none"><path fill="#7a6a80" d="M0 200V120l80-30 70 20 90-60 100 50 80-30 120 40 90-70 110 60 90-20 120 40 100-30 150 40V200z"/></svg>
+    </div>
+    <div class="layer l-hill" data-db-speed="-0.08" aria-hidden="true">
+      <svg viewBox="0 0 1200 200" preserveAspectRatio="none"><path fill="#4d5e3a" d="M0 200V90c120-40 260-40 380 0s260 50 400 10 300-40 420 0v100z"/><path fill="#3a4a2c" d="M0 200v-60c160-30 320 20 520-10s380-40 680 10v60z"/></svg>
+    </div>
+    <div class="hero-copy">
+      <h1>Antarium</h1>
+      <p>A calm ant colony you can keep running beside your day. Watch a single queen grow into a living city, one tunnel at a time.</p>
+    </div>
+    <div class="layer l-front" data-db-speed="0.1" aria-hidden="true">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path fill="#2b3a1f" d="M0 120V40l10-30 6 30 8-38 8 38 10-22 6 22 12-34 8 34 10-26 8 26 12-40 6 40 10-28 8 28 14-36 6 36 10-20 8 20 12-44 8 44 10-26 6 26 12-32 8 32 10-24 8 24 14-40 6 40 10-30 8 30 12-36 8 36 10-22 6 22 12-42 8 42 10-28 8 28 14-34 6 34 10-26 8 26 12-38 8 38 10-24 6 24 12-30 8 30 10-40 8 40 14-26 6 26 10-34 8 34 12-22 8 22 10-38 6 38 12-28 8 28 10-32 8 32 14-24 6 24 10-40 8 40 12-30 8 30 10-36 6 36 12-26 8 26 10-34 8 34 14-28 6 28 10-38 8 38 12-24 8 24 10-30 6 30 12-40 8 40 10-26 8 26 14-36 6 36 10-22 8 22 12-42 8 42 10-28 6 28 12-34 8 34 10-24 8 24 14-38 6 38 10-30 8 30 12-36 8 36 10-26 6 26 12-40 8 40 10-28 8 28 14-32 6 32 10-24 8 24 12-38 8 38 10-30 6 30 12-34 8 34 10-26 8 26 14-40 6 40 10-28 8 28 12-36 8 36 10-24 6 24 12-30 8 30 10-38 8 38 14-26 6 26 10-34 8 34 12-28 8 28V120z"/>
+        <rect y="70" width="1200" height="50" fill="#21180f"/>
+      </svg>
+    </div>
+    <div class="glass" aria-hidden="true"></div>
+  </section>
+
+  <!-- Act 2: slow down -->
+  <section class="slow" data-db="act" style="--len:190vh" aria-label="A slow game on purpose">
+    <div class="db-stage">
+      <div class="lines">
+        <h2 data-db-cue="0.04-1" data-db-hold>Nothing to lose.</h2>
+        <h2 data-db-cue="0.28-1" data-db-hold>No timer to beat.</h2>
+        <h2 data-db-cue="0.52-1" data-db-hold>Just a little world <em>to check in on.</em></h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 3: dig (peak + signature move) -->
+  <section class="dig" id="dig" data-db="act" style="--len:420vh" aria-label="Under the meadow">
+    <div class="db-stage">
+      <div class="earth" aria-hidden="true">
+        <svg viewBox="0 0 1000 3000" preserveAspectRatio="xMidYMin slice">
+          <defs>
+            <radialGradient id="warm"><stop offset="0" stop-color="#eaa53d" stop-opacity=".55"/><stop offset="1" stop-color="#eaa53d" stop-opacity="0"/></radialGradient>
+            <pattern id="grit" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="transparent"/><rect x="6" y="9" width="4" height="4" fill="#ffffff0d"/><rect x="27" y="22" width="4" height="4" fill="#0000001f"/><rect x="15" y="31" width="4" height="4" fill="#ffffff09"/></pattern>
+          </defs>
+          <rect width="1000" height="140" fill="#5f7d3a"/>
+          <rect y="120" width="1000" height="40" fill="#3f5a28"/>
+          <rect y="160" width="1000" height="700" fill="#3a2a1c"/>
+          <rect y="860" width="1000" height="760" fill="#2c2016"/>
+          <rect y="1620" width="1000" height="760" fill="#21180f"/>
+          <rect y="2380" width="1000" height="620" fill="#17110b"/>
+          <rect y="160" width="1000" height="2840" fill="url(#grit)"/>
+          <g fill="#4a3826"><rect x="120" y="420" width="60" height="36" rx="8"/><rect x="760" y="980" width="90" height="48" rx="12"/><rect x="220" y="1500" width="70" height="40" rx="10"/><rect x="820" y="2100" width="110" height="60" rx="14"/><rect x="90" y="2600" width="80" height="44" rx="10"/></g>
+          <g stroke="#5b4a2a" stroke-width="5" fill="none" stroke-linecap="round"><path d="M300 160c-10 80 30 120 10 220M310 300c30 40 60 50 70 100"/><path d="M700 160c20 90-20 140 0 240M710 330c-40 30-60 60-60 110"/></g>
+          <path class="tunnel-glow" d="M500 150 C 500 300, 420 360, 440 520 S 600 700, 560 900 S 380 1100, 420 1300 S 640 1500, 600 1720 S 400 1960, 450 2200 S 620 2480, 540 2760"/>
+          <path class="tunnel" d="M500 150 C 500 300, 420 360, 440 520 S 600 700, 560 900 S 380 1100, 420 1300 S 640 1500, 600 1720 S 400 1960, 450 2200 S 620 2480, 540 2760"/>
+          <g>
+            <ellipse class="chamber-light" data-at=".18" cx="560" cy="900" rx="210" ry="120"/>
+            <ellipse class="chamber" data-at=".18" cx="600" cy="900" rx="120" ry="50"/>
+            <ellipse class="chamber-light" data-at=".42" cx="420" cy="1300" rx="210" ry="120"/>
+            <ellipse class="chamber" data-at=".42" cx="380" cy="1310" rx="130" ry="52"/>
+            <ellipse class="chamber-light" data-at=".66" cx="600" cy="1720" rx="210" ry="120"/>
+            <ellipse class="chamber" data-at=".66" cx="650" cy="1730" rx="140" ry="54"/>
+            <ellipse class="chamber-light" data-at=".9" cx="540" cy="2760" rx="260" ry="150"/>
+            <ellipse class="chamber" data-at=".9" cx="540" cy="2770" rx="170" ry="64"/>
+          </g>
+          <g class="ants"></g>
+        </svg>
+      </div>
+
+      <div class="gauge" aria-hidden="true">depth<b><span id="depth">0</span> cm</b></div>
+
+      <div class="dig-notes">
+        <article data-db-cue="0.02-0.17"><p class="kicker">Under the meadow</p><h3>Keep scrolling. You're digging.</h3><p class="soft">Everything in Antarium is a cut through the earth, from the flowers down to the deepest chamber.</p></article>
+        <article data-db-cue="0.2-0.4"><p class="kicker">First chamber</p><h3>The queen starts alone.</h3><p class="soft">One founding queen, one small room. Every ant you will ever see starts here.</p></article>
+        <article data-db-cue="0.44-0.64"><p class="kicker">Nursery</p><h3>The brood is raised in the warm.</h3><p class="soft">Workers carry eggs and larvae to where the soil is just right.</p></article>
+        <article data-db-cue="0.68-0.88"><p class="kicker">Pantry</p><h3>Food is stored for winter.</h3><p class="soft">Ants find their way back home with every crumb you place in the meadow.</p></article>
+        <article data-db-cue="0.91-1" data-db-hold><p class="kicker">The deepest room</p><h3>From a lone queen to thousands.</h3><p class="soft">The colony keeps growing gently, even while you're away.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 4: weather (reveal) -->
+  <section class="weather" data-db="act" style="--len:200vh" aria-label="Weather and seasons">
+    <div class="db-stage">
+      <div class="state day">
+        <div class="text">
+          <h2>Sunny mornings.</h2>
+          <p>Day and night and all four seasons, with nature sounds that follow what you see.</p>
+        </div>
+      </div>
+      <div class="state night">
+        <div class="rain" aria-hidden="true"></div>
+        <div class="flash" aria-hidden="true"></div>
+        <div class="text">
+          <h2>Stormy nights.</h2>
+          <p>Thunderstorms build up slowly. Rain floods the tunnels and collects in small puddles.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 5: your way (pan) -->
+  <section class="ways" data-db="act" style="--len:280vh" aria-label="Play your way">
+    <div class="db-stage">
+      <header><h2 data-db-words data-db-in>Play your way.</h2></header>
+      <div class="pan-window">
+        <div class="pan-row" data-db-pan>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/></svg><h3>Observer</h3><p>Watch, discover and take photos, completely relaxed.</p><span class="tag">PRESET</span></article>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><path d="M3 20l6-10 4 6 3-4 5 8z"/></svg><h3>Adventure</h3><p>Nature takes its course, with real conditions and possible conflicts.</p><span class="tag">PRESET</span></article>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="17" cy="7" r="2"/><circle cx="14" cy="17" r="2"/></svg><h3>Your own mix</h3><p>Switch modules on and off at any time and put it together yourself.</p><span class="tag">PRESET</span></article>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M8 4v13"/></svg><h3>Field Journal</h3><p>Discover real ant behaviour, photograph it and collect stars, stamps and postcards.</p><span class="tag">MODULE</span></article>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><h3>Fall asleep</h3><p>Pick rain in the forest, a brook or the sounds underground. The screen dims and the sound fades out.</p><span class="tag">WAY TO RELAX</span></article>
+          <article class="card"><svg viewBox="0 0 24 24" fill="none" stroke="#eaa53d" stroke-width="1.6" aria-hidden="true"><path d="M3 18c4-8 14-8 18 0"/><circle cx="12" cy="8" r="2"/></svg><h3>Documentary</h3><p>The camera moves on its own and tells you what is happening, like a small nature film.</p><span class="tag">WAY TO RELAX</span></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 6: facts -->
+  <section class="facts" aria-label="What's inside">
+    <div data-db-in>
+      <strong class="big" data-db-count="34">34</strong>
+      <p class="big-label">real ant species from around the world, each with its own way of building and living.</p>
+    </div>
+    <ul>
+      <li data-db-in><strong>A living meadow</strong><span>Hedgehogs, deer, foxes, squirrels and birds, hiding behind bushes, logs and rocks.</span></li>
+      <li data-db-in><strong>Weather that builds up</strong><span>Rain, fog, snow and thunderstorms that come and go slowly.</span></li>
+      <li data-db-in><strong>Your colony, saved</strong><span>Back it up to a file and load it again later.</span></li>
+      <li data-db-in><strong>Phone and PC</strong><span>Plays in your browser, portrait or landscape, in English and German.</span></li>
+    </ul>
+  </section>
+
+  <!-- Act 7: close -->
+  <section class="close" aria-label="Play Antarium">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="hill" aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true"></div>
+    <h2>Your colony is waiting.</h2>
+    <p>Start with a single queen tonight. Check in tomorrow.</p>
+    <a class="btn" href="https://ui-edi.itch.io/antarium" target="_blank" rel="noopener">Play in browser <small>free</small></a>
+    <p class="meta">Made with love for nature by a solo developer, with a lot of help from AI.</p>
+  </section>
+
+</main>
+<!-- DREHBUCH:JS -->
+<script>
+  // Signature move: the scroll digs the tunnel, ants walk the dug part, chambers light up, depth counts.
+  (function () {
+    var act = document.getElementById("dig");
+    var stage = act.querySelector(".db-stage");
+    var earth = act.querySelector(".earth");
+    var tunnel = act.querySelector(".tunnel");
+    var glow = act.querySelector(".tunnel-glow");
+    var depth = document.getElementById("depth");
+    var chambers = act.querySelectorAll("[data-at]");
+    var antsG = act.querySelector(".ants");
+    var len = tunnel.getTotalLength();
+    [tunnel, glow].forEach(function (t) { t.style.strokeDasharray = len; t.style.strokeDashoffset = len; });
+
+    var NS = "http://www.w3.org/2000/svg", ants = [];
+    for (var i = 0; i < 9; i++) {
+      var a = document.createElementNS(NS, "g");
+      a.innerHTML = '<ellipse class="ant" rx="9" ry="5"/><circle class="ant" cx="10" r="4"/><circle class="ant" cx="-11" r="6"/>';
+      antsG.appendChild(a);
+      ants.push({ el: a, t: Math.random(), v: 0.0006 + Math.random() * 0.0008, dir: Math.random() < .5 ? 1 : -1 });
+    }
+
+    var dug = 0;
+    function place() {
+      ants.forEach(function (o) {
+        o.t += o.v * o.dir;
+        if (o.t > 1) { o.t = 1; o.dir = -1; } if (o.t < 0) { o.t = 0; o.dir = 1; }
+        var at = o.t * dug * len;
+        var p1 = tunnel.getPointAtLength(at), p2 = tunnel.getPointAtLength(Math.min(len, at + 2));
+        var ang = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + (o.dir < 0 ? 180 : 0);
+        o.el.setAttribute("transform", "translate(" + p1.x.toFixed(1) + " " + p1.y.toFixed(1) + ") rotate(" + ang.toFixed(0) + ")");
+        o.el.style.opacity = dug > 0.02 ? 1 : 0;
+      });
+    }
+    if (!Drehbuch.reduced) (function loop() { place(); requestAnimationFrame(loop); })();
+
+    Drehbuch.on(act, function (p) {
+      dug = Drehbuch.reduced ? 1 : Math.min(1, p * 1.08);
+      var off = len * (1 - dug);
+      tunnel.style.strokeDashoffset = off; glow.style.strokeDashoffset = off;
+      var shift = (earth.offsetHeight - stage.offsetHeight) * Math.min(1, p * 1.02);
+      if (!Drehbuch.reduced) earth.style.transform = "translate3d(0," + (-shift).toFixed(1) + "px,0)";
+      depth.textContent = Math.round(dug * 180);
+      chambers.forEach(function (c) { c.classList.toggle("lit", dug >= +c.dataset.at || Drehbuch.reduced); });
+      if (Drehbuch.reduced) place();
+    });
+  })();
+</script>
+</body>
+</html>

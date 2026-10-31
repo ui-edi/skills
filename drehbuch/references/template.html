@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Product name – one line about it</title>
+<meta name="description" content="One sentence the visitor should believe.">
+<!-- Optional: Google Fonts link here -->
+<!-- DREHBUCH:CSS -->
+<style>
+  /* Theme: six colours, two fonts. */
+  :root {
+    --db-canvas: #0b0a09; --db-surface: #171513;
+    --db-ink: #f3ece2;    --db-ink-soft: #a89f94;
+    --db-accent: #e8643c; --db-accent-ink: #120f0d;
+    --db-font-display: system-ui, sans-serif;
+    --db-font-text: system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--db-font-display); line-height: 1.05; margin: 0; text-wrap: balance; }
+  p { margin: 0; max-width: 60ch; }
+  a { color: inherit; }
+  .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 999px;
+         background: var(--db-accent); color: var(--db-accent-ink); font-weight: 700; text-decoration: none; }
+  /* Page styles go here. */
+</style>
+</head>
+<body>
+<main>
+  <!-- Act 1: hero (parallax) -->
+  <section class="hero" aria-label="Intro">
+    <h1>…</h1>
+  </section>
+
+  <!-- Act 2: pinned act with cues -->
+  <section data-db="act" style="--len:250vh" aria-label="…">
+    <div class="db-stage">
+      <h2 data-db-cue="0.05-1" data-db-hold>…</h2>
+    </div>
+  </section>
+
+  <!-- Last act: the close resolves and holds -->
+  <section class="close" aria-label="…">
+    <h2>…</h2>
+    <a class="btn" href="#">One action</a>
+  </section>
+</main>
+<!-- DREHBUCH:JS -->
+<script>
+  // Signature move: Drehbuch.on(document.querySelector('#act'), p => { … });
+</script>
+</body>
+</html>

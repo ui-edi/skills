@@ -9,6 +9,7 @@ Agent-Skills für Claude (claude.ai, Claude Code) und andere KI-Agenten, die `SK
 | --- | --- |
 | [kreuzfeuer](kreuzfeuer/SKILL.md) | 🔥 Puts your idea under friendly crossfire, one question at a time, and logs every answer. · Nimmt deine Idee Frage für Frage ins Kreuzfeuer und protokolliert jede Antwort. |
 | [klartext](klartext/SKILL.md) | 💬 Makes AI-assisted text sound like you again, in German and English. · Macht KI-Texte wieder menschlich, auf Deutsch und Englisch. |
+| [drehbuch](drehbuch/SKILL.md) | 🎬 Scroll-driven landing pages written like a screenplay, as one HTML file that works on phones. · Scroll-Landingpages wie ein Drehbuch, als eine HTML-Datei, die am Handy funktioniert. |
 
 ---
 
@@ -38,6 +39,18 @@ Text written with AI help gives itself away: "It's not X, it's Y", "Here's the k
 
 **Start it** with something like: "Klartext this store description" or "Does this README sound like AI?"
 
+### Drehbuch (Screenplay)
+
+Scrolling becomes the timeline. Drehbuch plans a landing page like a short film (acts, a feeling curve, one peak, a real ending), builds it on its own small scroll engine and checks it by photographing every scroll position on desktop, phone and with reduced motion.
+
+- Short brief, then a screenplay table: one device per act, at least four device families, never the same twice in a row
+- One bespoke signature move per page, written in page code
+- Delivered as **one self-contained HTML file** (engine inlined), ready for an artifact, itch.io or GitHub Pages
+- Phone-first composition and a design floor with a refuse list (no "scroll down" arrows, no fake stats, no AI-purple gradients)
+- Example: [`drehbuch/examples/antarium`](drehbuch/examples/antarium) – scrolling digs you down through the earth into an ant nest
+
+**Start it** with something like: "Drehbuch a landing page for my game" or "Make a scroll page for my app".
+
 ### Install
 
 **claude.ai (web, desktop, mobile):** Download a skill folder (for example `kreuzfeuer` or `klartext`) as a ZIP and upload it under Settings → Capabilities → Skills. (Menu names can change; look for "Skills".)
@@ -46,7 +59,7 @@ Text written with AI help gives itself away: "It's not X, it's Y", "Here's the k
 
 ```bash
 git clone https://github.com/ui-edi/skills.git
-cp -r skills/kreuzfeuer skills/klartext ~/.claude/skills/
+cp -r skills/kreuzfeuer skills/klartext skills/drehbuch ~/.claude/skills/
 ```
 
 **Other agents:** Point your agent at the skill's `SKILL.md`.
@@ -79,6 +92,18 @@ KI-Texte verraten sich: «Es geht nicht um X, sondern um Y», «Und jetzt kommt 
 
 **Starten** zum Beispiel mit: «Mach Klartext aus dieser Store-Beschreibung» oder «Klingt dieses README nach KI?»
 
+### Drehbuch
+
+Scrollen wird zur Zeitleiste. Drehbuch plant eine Landingpage wie einen Kurzfilm (Akte, Gefühlskurve, ein Höhepunkt, ein echter Schluss), baut sie mit einer eigenen kleinen Scroll-Engine und prüft sie, indem es jede Scroll-Position auf Desktop, Handy und mit reduzierter Bewegung fotografiert.
+
+- Kurzes Briefing, dann eine Drehbuch-Tabelle: ein Effekt pro Akt, mindestens vier verschiedene, nie zweimal derselbe hintereinander
+- Pro Seite ein eigener Signature-Effekt, direkt im Seitencode
+- Ergebnis ist **eine einzige HTML-Datei** (Engine eingebaut), bereit für ein Artefakt, itch.io oder GitHub Pages
+- Handy zuerst gestaltet, mit Design-Grundregeln und Verbotsliste (keine «Scroll down»-Pfeile, keine erfundenen Zahlen, keine KI-Lila-Verläufe)
+- Beispiel: [`drehbuch/examples/antarium`](drehbuch/examples/antarium) – beim Scrollen gräbst du dich durch die Erde ins Ameisennest
+
+**Starten** zum Beispiel mit: «Schreib ein Drehbuch für eine Landingpage meines Games» oder «Mach eine Scroll-Seite für meine App».
+
 ### Installation
 
 **claude.ai (Web, Desktop, Handy):** Einen Skill-Ordner (z. B. `kreuzfeuer` oder `klartext`) als ZIP herunterladen und unter Einstellungen → Fähigkeiten → Skills hochladen. (Menünamen können sich ändern; such nach «Skills».)
@@ -87,7 +112,7 @@ KI-Texte verraten sich: «Es geht nicht um X, sondern um Y», «Und jetzt kommt 
 
 ```bash
 git clone https://github.com/ui-edi/skills.git
-cp -r skills/kreuzfeuer skills/klartext ~/.claude/skills/
+cp -r skills/kreuzfeuer skills/klartext skills/drehbuch ~/.claude/skills/
 ```
 
 **Andere Agenten:** Den Agenten auf die `SKILL.md` des Skills verweisen.
@@ -101,6 +126,9 @@ Kreuzfeuer ist von der Idee hinter «grill-me» aus [AIS-OS](https://github.com/
 
 Klartext is inspired by [human-speak](https://github.com/nateherkai/human-speak) by Nate Herk (MIT). The text is written independently and extended with German patterns.
 Klartext ist von [human-speak](https://github.com/nateherkai/human-speak) von Nate Herk (MIT) inspiriert. Der Text ist eigenständig geschrieben und um deutsche Muster erweitert.
+
+Drehbuch is inspired by [scroll-craft](https://github.com/nateherkai/scroll-craft) by Nate Herk (MIT). Text, engine and scripts are written independently.
+Drehbuch ist von [scroll-craft](https://github.com/nateherkai/scroll-craft) von Nate Herk (MIT) inspiriert. Text, Engine und Skripte sind eigenständig geschrieben.
 
 ## License
 
