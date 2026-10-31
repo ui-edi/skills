@@ -70,12 +70,12 @@ Show the table to the user if they are around and the decisions are theirs. Unde
 ## Step 3: Assets
 
 Order of preference:
-1. **The user's own material:** screenshots, photos, footage, logo. Real beats generated.
+1. **The user's own material:** screenshots, sprites, photos, footage, logo. Real beats generated.
 2. **Drawn in code:** SVG and CSS scenes, shapes, gradients, illustrations. Perfect for games, apps and illustrated brands, weighs almost nothing and stays sharp on every phone.
 3. **Generated images,** only if an image tool is available and the user agrees. Write one style preamble and reuse it word for word in every prompt so the images look like one shoot. Look at every image before using it.
 4. **Free stock,** only with a licence that allows it, and say which.
 
-Never put text into images; text is always real markup. Never use photos of real public figures. Video for scrubbing must have no audio track and dense keyframes (for example `ffmpeg -i in.mp4 -an -c:v libx264 -g 6 -crf 23 -movflags +faststart out.mp4`).
+Pixel art: scale only by whole numbers and set `image-rendering: pixelated`, so pixels stay crisp. Never put text into images; text is always real markup. Never use photos of real public figures. Video for scrubbing must have no audio track and dense keyframes (for example `ffmpeg -i in.mp4 -an -c:v libx264 -g 6 -crf 23 -movflags +faststart out.mp4`).
 
 ## Step 4: Build
 
