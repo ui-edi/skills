@@ -28,6 +28,7 @@ You have an idea in your head: a game, an app, a feature, a plan. Kreuzfeuer ask
 - Reads existing docs and code first, so it never asks what is already written down
 - Speaks your language: write German, get grilled in German; write English, get English
 - Stops the moment you say "stop"
+- Ends with the smallest first step you can already test, and a handover list in order, each task with a "done when"
 
 **Start it** with something like: "Crossfire me on my new app idea" or "Grill me on the release plan".
 
@@ -132,6 +133,7 @@ Du hast eine Idee im Kopf: ein Game, eine App, ein Feature, einen Plan. Kreuzfeu
 - Liest zuerst vorhandene Dokumente und Code und fragt nie, was schon dasteht
 - Spricht deine Sprache: Schreibst du Deutsch, wirst du auf Deutsch gelöchert
 - Hört sofort auf, wenn du «Stopp» sagst
+- Endet mit dem kleinsten ersten Schritt, den man schon testen kann, und einer sortierten Übergabe-Liste, jede Aufgabe mit «fertig, wenn…»
 
 **Starten** zum Beispiel mit: «Nimm meine App-Idee ins Kreuzfeuer» oder «Grill mich zum Release-Plan».
 

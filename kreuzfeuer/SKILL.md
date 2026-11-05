@@ -5,11 +5,11 @@ description: Puts a plan, idea, concept or design under friendly crossfire, one 
 
 # Kreuzfeuer (Crossfire)
 
-*Inspired by "grill-me" from AIS-OS by Nate Herk (github.com/nateherkai/AIS-OS). Independently rewritten.*
+*Version 1.1 · Inspired by "grill-me" from AIS-OS by Nate Herk (github.com/nateherkai/AIS-OS). Independently rewritten.*
 
 ## What this is
 
-The user has an idea in their head: a game, an app, a feature, a plan. This skill gets all of it out by asking targeted questions until no important question is left open. The result is a clean log the user can build on right away.
+The user has an idea in their head: a game, an app, a feature, a plan. This skill gets all of it out by asking targeted questions until no important question is left open. The result is a clean log the user can build on right away, ending with the smallest first step that can already be tried out.
 
 The real value is the **log**, not the conversation. Long chats lose details, so every answer is recorded the moment it is given.
 
@@ -37,6 +37,7 @@ After **every** answer and **before** the next question:
 - Write the answer into the log: topic of the question, what the user decided or said (their own wording where it matters), open points.
 - Never collect several answers and write them later in one batch.
 - If a later answer changes an earlier one, do not delete the old entry. Mark it "superseded by Q7".
+- If an answer rests on a guess about users, players or the market ("players will love the combo system"), log it as an **assumption to test**, not as a fact.
 - If saving fails, say so plainly and keep the answer visible in the chat. Never claim it was saved.
 
 ## How to ask
@@ -49,7 +50,9 @@ After **every** answer and **before** the next question:
 - **New topics from the user are welcome.** If they bring up something unasked (a bug, a new wish), log it as its own entry, marked as raised by the user.
 - About every 5 questions, give a mini recap in 2–3 lines ("Where we stand: …").
 - If the user says "stop", "pause" or "enough": stop at once, no further question.
-- Near the end, ask: "Anything we haven't touched yet?"
+- Near the end, ask two closing questions, one per message:
+  1. **"What is the smallest first step we could already try out or test?"** For a game or app: the smallest playable or usable version. For a plan or decision: the first concrete action. Offer a suggestion if the user is unsure.
+  2. "Anything we haven't touched yet?"
 
 ## Typical branches
 
@@ -72,23 +75,37 @@ Date: {date} · Goal: {one line} · Status: running / paused / done
 - Asked: …
 - User says: …
 - Suggestion (unconfirmed): …
+- Assumption to test: …
 - Open: …
 
 ## Open points
 - {point} → {who / when}
 
+## Assumptions to test
+- {assumption} → how to check it (e.g. with 3 testers, after the first build)
+
 ## Handover
-- [ ] {task for whoever builds next}
+First testable step: {one line}
+Order: confirmed by user / suggestion
+
+1. [ ] {task} · done when: {concrete, checkable result}
+2. [ ] {task} · done when: …
+
+Out of scope for now: …
 ```
 
-Confirmed decisions, unconfirmed suggestions and open questions always stay clearly distinguishable.
+Confirmed decisions, unconfirmed suggestions, assumptions and open questions always stay clearly distinguishable.
 
 ## At the end or on pause
 
 1. Check the log for contradictions and gaps. Mark contradictions; never decide them for the user.
 2. Set the status and the re-entry point ("continue at: monetization").
-3. If the result will be built in another chat or by another agent, fill the **Handover** section with a concrete task list and what is explicitly out of scope.
-4. Short wrap-up in the chat: key decisions, open points, the sensible next step, and how to hand the log over (for example: paste its link into the build chat).
+3. Fill the **Handover** section:
+   - Start with the first testable step from the closing question.
+   - List the tasks **in order**, most important or first-needed on top. Each task gets a "done when" that anyone can check (e.g. "done when: one full round can be played start to finish on the phone").
+   - The order is the user's call. Propose one, mark it as a suggestion, and ask briefly whether it fits. Only write "confirmed by user" once they agree.
+   - Name what is explicitly out of scope for now.
+4. Short wrap-up in the chat: key decisions, the first testable step, open points and assumptions, and how to hand the log over (for example: paste its link into the build chat).
 5. Suggest a follow-up, but never start it automatically.
 
 ## Boundaries
@@ -96,3 +113,8 @@ Confirmed decisions, unconfirmed suggestions and open questions always stay clea
 - Never ask for or store passwords, API keys or other secrets.
 - Do not publish, send or change anything in external systems.
 - Never write an unconfirmed idea into the log as the user's decision.
+
+## Changelog
+
+- **1.1:** Closing question about the smallest testable first step; handover as an ordered list with "done when" per task; assumptions to test marked separately.
+- **1.0:** First public version.
